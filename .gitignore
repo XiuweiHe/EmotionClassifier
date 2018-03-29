@@ -1,0 +1,13 @@
+/data/emotion_image
+/data/test
+/data/train
+/data
+/S052
+/lib
+*.iml
+*.ipr
+*.iws
+.idea/
+src/model/
+utils/train/
+src/.ipynb_checkpoints

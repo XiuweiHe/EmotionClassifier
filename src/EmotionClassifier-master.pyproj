@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{aadd5f82-0472-4a0d-81d9-231b396f4743}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>main.py</StartupFile>
+    <SearchPath>face-frontalization\</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId />
+    <InterpreterVersion />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="builddata.py" />
+    <Compile Include="emotionclassifier.py" />
+    <Compile Include="face-frontalization\camera_calibration.py" />
+    <Compile Include="face-frontalization\facial_feature_detector.py" />
+    <Compile Include="face-frontalization\frontalize.py" />
+    <Compile Include="face-frontalization\__init__.py" />
+    <Compile Include="main.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="face-frontalization\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Resources\logs\" />
+    <Folder Include="session\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\logs\events.out.tfevents.1513508546.DESKTOP-97KTGBV" />
+    <Content Include="Resources\logs\events.out.tfevents.1514816173.DESKTOP-97KTGBV" />
+    <Content Include="Resources\logs\events.out.tfevents.1514816504.DESKTOP-97KTGBV" />
+    <Content Include="Resources\logs\events.out.tfevents.1514818116.DESKTOP-97KTGBV" />
+    <Content Include="session\checkpoint" />
+    <Content Include="session\model.ckpt.data-00000-of-00001" />
+    <Content Include="session\model.ckpt.data-00000-of-00001.tempstate17379782587150860643" />
+    <Content Include="session\model.ckpt.index" />
+    <Content Include="session\model.ckpt.meta" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>
