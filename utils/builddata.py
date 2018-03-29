@@ -1,6 +1,5 @@
 ﻿import os
 import cv2
-import sys
 import dlib
 import numpy as np
 import shutil
@@ -10,10 +9,6 @@ import keras
 from time import time
 from collections import Counter
 import scipy.io as io
-sys.path.append('../face-frontalization')
-import frontalize as front
-import camera_calibration as camera
-import facial_feature_detector as feature_extraction
 
 cur_path = os.path.dirname(__file__)
 parent_path = os.path.dirname(cur_path)
@@ -63,7 +58,16 @@ class DataManager(object):
     load the dataset CK+ and fer2013
     """
     def __init__(self, dataset_name='CK+', dataset_path=None, num_classes = 8,image_size=(224, 224),b_gray_chanel = True):
+        """
 
+        :param dataset_name: select the dataset "CK" or "fer2013"
+        :param dataset_path: the dataset location dir
+        :param num_classes: the classes number of dataset
+        :param image_size: the image size output you want
+        :param b_gray_chanel: if or not convert image to gray
+
+        :return the tuple have image datas and image labels
+        """
         self.dataset_name = dataset_name
         self.dataset_path = dataset_path
         self.image_size = image_size
@@ -80,15 +84,19 @@ class DataManager(object):
 
     def get_data(self):
         if self.dataset_name == 'CK+':
-            ground_truth_data = self._load_ck()
+            data = self._load_ck()
         elif self.dataset_name == 'fer2013':
-            ground_truth_data = self._load_fer2013()
-        return ground_truth_data
+            data = self._load_fer2013()
+        return data
     def _load_ck(self):
-
+        # get the training data from the source dataset
         self.build_dataset(self.dataset_path,LABEL_DIR_CK,OUT_PUT_DIR_CK,'png')
+
+        # preprocess the select data, you can change augment it or not
         # self.get_data_ck(OUT_PUT_DIR_CK,augmentation=False,test_percent=0.3)
-        # data_ck = self.get_data_ck_split(data_dir=OUT_PUT_DIR_CK)
+
+        # get the training data and testing data separately
+        data_ck = self.get_data_ck_split(data_dir=OUT_PUT_DIR_CK)
         # print(np.shape(data_ck))
         return data_ck
 
@@ -102,8 +110,7 @@ class DataManager(object):
         :type output_dir: str
         :param itype: File type for output images.
         :type itype: str
-        :param augmentation: If advanced augmentation is enabled.
-        :type: augmentation: bool
+
         :return: The number of images.
         :rtype: int
         """
@@ -136,7 +143,6 @@ class DataManager(object):
             for i in range(self.num_classes):
                 os.makedirs(output_dir+'/'+str(i))
 
-        # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
         detector, count = dlib.get_frontal_face_detector(), 0
         for image_file in image_files:
             image = cv2.imread(image_file[0])
@@ -167,8 +173,11 @@ class DataManager(object):
         """ Gets the data from a directory of images organised by classification.
         :param input_dir: The directory of images.
         :type input_dir: str
-        :return: A list of images and labels.
-        :rtype: list of tuples each containing an image and a int
+        :param augmentation: if or not augment the data
+        :type augmentation: bool
+        :param test_percent: the test data percent of total dataset
+        :type test_percent: float
+
         """
         data, label, num = [], [] ,0
         for folder in sorted(os.listdir(input_dir)):
@@ -238,7 +247,12 @@ class DataManager(object):
                 print('%f numbers samples processed' % (count))
 
     def get_data_ck_split(self,data_dir = './data'):
-        
+        """Get the training and testing data from the splited data set
+        :param data_dir: the directory of image data set
+        :type data_dir: str
+        :return: the list contained training and testing data
+        :type: list
+        """
         train_data, train_label, test_data, test_label = [], [], [], []
 
         for folder in os.listdir(data_dir):
@@ -287,13 +301,17 @@ class DataManager(object):
         print('number of test samples:',test_data.shape[0])
         # parameters = {'train':Counter(train_label),'test':Counter(test_label)}
         # io.savemat('param.txt',parameters)
+        # print the number of samples in each category
         print('train data statistic: ',Counter(train_label))
         print('test data statistic: ', Counter(test_label))
         return [train_data, train_label, test_data, test_label]
 
 
     def _load_fer2013(self):
-
+        """ load the dataset of fer2013 for the file fer2013.csv
+        :return: a list contains the training ,private test and public test set
+        :type: list
+        """
         # fer2013 dataset:
         # Training       28709
         # PrivateTest     3589
@@ -364,6 +382,7 @@ def split_data_ck(x, y, validation_split=.2):
     return train_data, val_data
 
 def preprocess_input(x,v2 = True):
+    """normalize the data to [0,1] and select transform it to [-0.5,0.5] or not"""
     x = x.astype('float32')
     x = x / 255.0
     if v2:

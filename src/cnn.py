@@ -9,6 +9,7 @@ from keras.layers import MaxPooling2D
 from keras.layers import SeparableConv2D
 from keras import layers
 from keras.regularizers import l2
+from keras.utils import plot_model
 
 def simple_CNN(input_shape, num_classes):
 
@@ -389,13 +390,16 @@ def tiny_Alexnet(input_shape,num_classes):
     return model
 
 if __name__ == "__main__":
+    model_dir = '../tmp/'
     input_shape = (64, 64, 1)
     num_classes = 7
-    #model = tiny_XCEPTION(input_shape, num_classes)
+    model = tiny_XCEPTION(input_shape, num_classes)
     #model.summary()
-    #model = mini_XCEPTION(input_shape, num_classes)
+    # model = mini_XCEPTION(input_shape, num_classes)
     #model.summary()
     #model = big_XCEPTION(input_shape, num_classes)
     #model.summary()
-    model = simple_CNN((48, 48, 1), num_classes)
-    model.summary()
+    # model = simple_CNN((48, 48, 1), num_classes)
+    # model.summary()
+    # plot_model(model=model,to_file=model_dir+'mini_XCEPTION.png',show_shapes=True)
+    plot_model(model=model, to_file=model_dir + 'tiny_XCEPTION.png', show_shapes=True)

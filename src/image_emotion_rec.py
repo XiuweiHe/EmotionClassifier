@@ -98,16 +98,19 @@ color = (0, 255, 0)
 cv2.namedWindow('window_frame')
 image_dir = '../test_image\Lecun&hiton.png'
 flag_video = False
+flag_img = False
 if flag_video:
     emotion_video = '../test_image/emotion.avi'
     img_root = '../test_image/'
     fps = 15
     # Define the codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(img_root+'reslut_emotion.avi',fourcc, fps, (640,490))
+    out = cv2.VideoWriter(img_root+'result_emotion.avi',fourcc, fps, (640,490))
 
     cap = cv2.VideoCapture(emotion_video)
-
+    from PIL import Image
+    import imageio
+    frame = []
     while(cap.isOpened()):
         ret, bgr_image = cap.read()
 
@@ -138,7 +141,7 @@ if flag_video:
             break
     cap.release()
     cv2.destroyAllWindows()
-else:
+elif flag_img:
     bgr_image = cv2.imread(image_dir)
     gray_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)
     # gray_image = cv2.resize(gray_image,dsize=(0,0),fx=0.25,fy=0.25)
@@ -160,5 +163,45 @@ else:
     cv2.imshow('window_frame', bgr_image)
     if cv2.waitKey() & 0xFF == ord('q'):
         cv2.destroyAllWindows()
+else:
+    from PIL import Image
+    emotion_video = '../test_image/emotion.avi'
+    img_root = '../test_image/'
+    img_dir = '../S052'
+    img_root = '../test_image/'
+    frame = []
+    for file in os.listdir(img_dir):
+        dir_path = os.path.join(img_dir, file)
+        for img in os.listdir(dir_path):
+            img_file = dir_path + '/' + img
+            bgr_image = cv2.imread(img_file)
+            gray_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2GRAY)
+            gray_image = cv2.resize(gray_image, dsize=(0, 0), fx=0.25, fy=0.25)
+            # rgb_image = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+            start = time()
+            face_size = emotion_classifier.input_shape[1:3]
+            faces, bboxs = detect_faces(gray_image, face_size=face_size, method='cv')
+            print('detect face cost time: %f' % (time() - start))
+            for face, bbox in zip(faces, bboxs):
+                try:
+                    start = time()
+                    emotion = EmotionModel(data_name='fer2013', image=face).model_predict()
+                    print('predict emotion cost time: %f' % (time() - start))
+                except:
+                    continue
+
+                bbox = [x * 4 for x in bbox]
+                draw_bounding_box(bbox, bgr_image, color)
+                draw_text(bbox, bgr_image, emotion, color, x_offset=0, y_offset=0, font_scale=2, thickness=2)
+            try:
+                img = Image.fromarray(bgr_image)
+                frame.append(img)
+                cv2.imshow('window_frame', bgr_image)
+            except:
+                continue
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    cv2.destroyAllWindows()
+    img.save(img_root+'emotion.gif',save_all=True, append_images=frame,loop=1,duration=1,comment=b"aaabb")
 
 
