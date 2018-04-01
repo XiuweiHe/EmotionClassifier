@@ -90,15 +90,15 @@ class DataManager(object):
         return data
     def _load_ck(self):
         # get the training data from the source dataset
-        self.build_dataset(self.dataset_path,LABEL_DIR_CK,OUT_PUT_DIR_CK,'png')
+        # self.build_dataset(self.dataset_path,LABEL_DIR_CK,OUT_PUT_DIR_CK,'png')
 
         # preprocess the select data, you can change augment it or not
-        # self.get_data_ck(OUT_PUT_DIR_CK,augmentation=False,test_percent=0.3)
+        self.get_data_ck(OUT_PUT_DIR_CK,augmentation=False,test_percent=0.3)
 
         # get the training data and testing data separately
-        data_ck = self.get_data_ck_split(data_dir=OUT_PUT_DIR_CK)
+        # data_ck = self.get_data_ck_split(data_dir=OUT_PUT_DIR_CK)
         # print(np.shape(data_ck))
-        return data_ck
+        # return data_ck
 
     def build_dataset(self, image_dir, label_dir, output_dir,itype='png'):
         """ Builds a dataset using data augmentation and normalization built for the CK+ Emotion Set.
@@ -128,7 +128,7 @@ class DataManager(object):
                             if os.path.isfile(label_file):
                                 read_file = open(label_file, 'r')
                                 label = int(float(read_file.readline().split('.')[0]))
-                                for i in range(-1, -6, -1):
+                                for i in range(-1, -4, -2):
                                     image_file = sorted(os.listdir(image_dir + '/' + outer_folder + '/' + inner_folder))[i]
                                     if image_file.split('.')[1] == itype:
                                         image_files.append((image_dir+'/'+outer_folder+'/'+inner_folder+'/'+image_file, label))
@@ -160,7 +160,7 @@ class DataManager(object):
                 # cv2.destroyAllWindows()
 
                 face = image[top:bottom, left:right]
-                face = cv2.resize(face, (232, 232))
+                face = cv2.resize(face, (299, 299))
                 name = output_dir + '/' + str(image_file[1]) + '/' + image_file[0][-21:-4] + str(count) + '.' + itype
                 cv2.imwrite(name, face)
                 count += 1
@@ -205,44 +205,17 @@ class DataManager(object):
         count = 0
         for n in range(len(train_data)):
             image = train_data[n]
-            if augmentation:
-                # raw_image = cv2.imread(image_file[0])
-                # image = tf.Variable(raw_image)
-                image_var = tf.placeholder("uint8", [None, None, 3])
-                images = pre_process(image)
-                with tf.Session() as session:
-                    result = session.run(images, feed_dict={image_var: image})
-                # cv2.imshow("image", result.astype(np.uint8))
-                # if cv2.waitKey(5):
-                #     break
-                # cv2.destroyAllWindows()
-                image = result.astype(np.uint8)
-            patches = [image[0:224, 0:224], image[8:232, 0:224], image[8:232, 8:232],
-                       image[0:224, 8:232], image[4:228, 4:228]]
-
-            for i in range(len(patches)):
-                name = train_dir + '/' + str(train_label[n]) + '/' + str(train_label[n])+ '_' + str(count) + '.' + 'png'
-                cv2.imwrite(name, patches[i])
-                name = train_dir + '/' + str(train_label[n]) + '/' + str(train_label[n]) + '_' + str(
-                    count) + '.' + 'png'
-                cv2.imwrite(name, cv2.flip(patches[i], 1))
-                count += 1
+            name = train_dir + '/' + str(train_label[n]) + '/' + '_' + str(count) + '.' + 'png'
+            cv2.imwrite(name, image)
+            count += 1
             if count % 20 == 0:
                 print('%f numbers samples processed'%(count))
         count = 0
         for n in range(len(test_data)):
             image = test_data[n]
-            patches = [image[0:224, 0:224], image[8:232, 0:224], image[8:232, 8:232],
-                       image[0:224, 8:232], image[4:228, 4:228]]
-
-            for i in range(len(patches)):
-                name = test_dir + '/' + str(test_label[n]) + '/' + str(test_label[n]) + '_' + str(
-                    count) + '.' + 'png'
-                cv2.imwrite(name, patches[i])
-                name = test_dir + '/' + str(test_label[n]) + '/' + str(test_label[n]) + '_' + str(
-                    count) + '.' + 'png'
-                cv2.imwrite(name, cv2.flip(patches[i], 1))
-                count += 1
+            name = test_dir + '/' + str(test_label[n]) + '/' +  '_' + str(count) + '.' + 'png'
+            cv2.imwrite(name, image)
+            count += 1
             if count % 20 == 0:
                 print('%f numbers samples processed' % (count))
 
@@ -392,7 +365,7 @@ def preprocess_input(x,v2 = True):
 
 if __name__ == "__main__":
 
-    # data = DataManager(dataset_name='CK+',image_size=(224,224)).get_data()
+    DataManager(dataset_name='CK+',image_size=(224,224)).get_data()
 
-    data = DataManager(dataset_name='fer2013',image_size=(64,64)).get_data()
+    # data = DataManager(dataset_name='fer2013',image_size=(64,64)).get_data()
     # build_dataset(IMAGE_DIR_CK,LABEL_DIR_CK,OUT_PUT_DIR_CK,'png',augmentation=False)

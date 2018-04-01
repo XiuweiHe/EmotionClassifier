@@ -11,3 +11,4 @@
 src/model/
 utils/train/
 src/.ipynb_checkpoints
+/src/pretrained_model/
