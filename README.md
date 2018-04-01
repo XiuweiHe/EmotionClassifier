@@ -24,7 +24,8 @@ real-time face detection and emotion classification
  * test video
  
  ![gif](test_image/emotion.gif)
- #Reference
+# Reference
+
 * [Xception: Deep Learning with Depthwise Separable Convolutions](https://arxiv.org/abs/1610.02357)
 * [Keras Applications](https://keras.io/applications/)
  
